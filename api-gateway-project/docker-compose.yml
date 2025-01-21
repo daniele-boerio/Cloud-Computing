@@ -1,0 +1,72 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"  # Il traffico arriverà a NGINX
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # Monta il file di configurazione
+    networks:
+      - app-network
+    depends_on:
+      - api-gateway-1
+      - api-gateway-2
+      - api-gateway-3
+      - products
+      - users
+
+  api-gateway-1:
+    image: api-gateway:latest
+    container_name: api-gateway-1
+    environment:
+      - GATEWAY_PORT=8080
+    networks:
+      - app-network
+    expose:
+      - "8080"  # Espone solo all'interno del network
+
+  api-gateway-2:
+    image: api-gateway:latest
+    container_name: api-gateway-2
+    environment:
+      - GATEWAY_PORT=8080
+    networks:
+      - app-network
+    expose:
+      - "8080"
+
+  api-gateway-3:
+    image: api-gateway:latest
+    container_name: api-gateway-3
+    environment:
+      - GATEWAY_PORT=8080
+    networks:
+      - app-network
+    expose:
+      - "8080"
+
+  # products
+  products:
+    image: products:latest
+    container_name: products
+    environment:
+      - SERVICE_PORT=3002
+    networks:
+      - app-network
+    expose:
+      - "3002"  # Espone solo all'interno del network
+
+  # users
+  users:
+    image: users:latest
+    container_name: users
+    environment:
+      - SERVICE_PORT=3001
+    networks:
+      - app-network
+    expose:
+      - "3001"  # Espone solo all'interno del network
+
+networks:
+  app-network:
+    driver: bridge
